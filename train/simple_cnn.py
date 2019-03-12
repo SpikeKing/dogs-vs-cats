@@ -8,6 +8,9 @@ import os
 import sys
 import tensorflow as tf
 
+os.environ['CUDA_DEVICE_ORDER'] = 'PCI_BUS_ID'
+os.environ['CUDA_VISIBLE_DEVICES'] = '0'
+
 p = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 if p not in sys.path:
     sys.path.append(p)
@@ -18,6 +21,7 @@ from root_dir import DATASET_DIR
 def main():
     image_height, image_width = 150, 150
     train_dir = os.path.join(DATASET_DIR, 'train')
+    print(train_dir)
     test_dir = os.path.join(DATASET_DIR, 'test')
 
     no_classes = 2

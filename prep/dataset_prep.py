@@ -49,6 +49,8 @@ def copy_files(target_folder, clz_name, n_start, n_end):
     for i in range(n_start, n_end):
         data_dict = cats_dict if clz_name == 'cat' else dogs_dict
         folder = new_train if target_folder == 'train' else new_test
+        folder = os.path.join(folder, clz_name)
+        mkdir_if_not_exist(folder)
         shutil.copy(data_dict[i], folder)
     print("[完成]目标文件夹: {}, 类别: {}, 起止: {} ~ {}".format(
         target_folder, clz_name, n_start, n_end))
