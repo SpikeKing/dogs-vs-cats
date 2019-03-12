@@ -28,7 +28,7 @@ def main():
     no_validation = 800
 
     epochs = 2
-    batch_size = 200
+    batch_size = 20
 
     no_train = 2000
     no_test = 800
@@ -39,10 +39,10 @@ def main():
 
     simple_cnn_model = simple_cnn(input_shape, no_classes)
 
-    generator_train = tf.keras.preprocessing.image.ImageDataGenerator(rescale=1. / 255)
-    generator_test = tf.keras.preprocessing.image.ImageDataGenerator(rescale=1. / 255)
+    generator_train = tf.keras.preprocessing.image.ImageDataGenerator(rescale=1. / 255.)
+    generator_test = tf.keras.preprocessing.image.ImageDataGenerator(rescale=1. / 255.)
 
-    train_images = generator_train.flow_from_directory(
+    train_generator = generator_train.flow_from_directory(
         train_dir,
         batch_size=batch_size,
         target_size=(image_width, image_height)
@@ -55,7 +55,7 @@ def main():
     )
 
     simple_cnn_model.fit_generator(
-        train_images,
+        train_generator,
         steps_per_epoch=epoch_steps,
         epochs=epochs,
         validation_data=test_images,
