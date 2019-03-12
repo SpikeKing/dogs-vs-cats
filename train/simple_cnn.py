@@ -45,13 +45,15 @@ def main():
     train_generator = generator_train.flow_from_directory(
         train_dir,
         batch_size=batch_size,
-        target_size=(image_width, image_height)
+        target_size=(image_width, image_height),
+        class_mode='binary'
     )
 
     test_images = generator_test.flow_from_directory(
         test_dir,
         batch_size=batch_size,
-        target_size=(image_width, image_height)
+        target_size=(image_width, image_height),
+        class_mode='binary'
     )
 
     simple_cnn_model.fit_generator(
