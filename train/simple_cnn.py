@@ -5,9 +5,14 @@ Copyright (c) 2019. All rights reserved.
 Created by C. L. Wang on 2019/3/12
 """
 import os
+import sys
 import tensorflow as tf
 
 from root_dir import DATASET_DIR
+
+p = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+if p not in sys.path:
+    sys.path.append(p)
 
 
 def main():
