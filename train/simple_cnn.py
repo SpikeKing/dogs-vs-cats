@@ -8,11 +8,11 @@ import os
 import sys
 import tensorflow as tf
 
-from root_dir import DATASET_DIR
-
 p = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 if p not in sys.path:
     sys.path.append(p)
+
+from root_dir import DATASET_DIR
 
 
 def main():
