@@ -6,7 +6,11 @@ Created by C. L. Wang on 2019/3/12
 """
 import os
 import sys
-import tensorflow as tf
+
+import keras
+from keras import layers
+from keras import models
+from keras.preprocessing.image import ImageDataGenerator
 
 os.environ['CUDA_DEVICE_ORDER'] = 'PCI_BUS_ID'
 os.environ['CUDA_VISIBLE_DEVICES'] = '0'
@@ -27,7 +31,7 @@ def main():
     no_classes = 2
     no_validation = 800
 
-    epochs = 2
+    epochs = 10
     batch_size = 20
 
     no_train = 2000
@@ -39,54 +43,48 @@ def main():
 
     simple_cnn_model = simple_cnn(input_shape, no_classes)
 
-    generator_train = tf.keras.preprocessing.image.ImageDataGenerator(rescale=1. / 255.)
-    generator_test = tf.keras.preprocessing.image.ImageDataGenerator(rescale=1. / 255.)
+    generator_train = ImageDataGenerator(rescale=1. / 255.)
+    generator_test = ImageDataGenerator(rescale=1. / 255.)
 
     train_generator = generator_train.flow_from_directory(
         train_dir,
-        batch_size=batch_size,
         target_size=(image_width, image_height),
-        class_mode='binary'
+        batch_size=batch_size
     )
 
-    test_images = generator_test.flow_from_directory(
+    test_generator = generator_test.flow_from_directory(
         test_dir,
-        batch_size=batch_size,
         target_size=(image_width, image_height),
-        class_mode='binary'
+        batch_size=batch_size
     )
 
     simple_cnn_model.fit_generator(
         train_generator,
         steps_per_epoch=epoch_steps,
         epochs=epochs,
-        validation_data=test_images,
+        validation_data=test_generator,
         validation_steps=test_steps
     )
 
 
 def simple_cnn(input_shape, no_classes):
-    model = tf.keras.models.Sequential()
-    model.add(tf.keras.layers.Conv2D(
-        filters=64,
-        kernel_size=(3, 3),
-        activation='relu',
-        input_shape=input_shape
-    ))
-    model.add(tf.keras.layers.Conv2D(
-        filters=128,
-        kernel_size=(3, 3),
-        activation='relu'
-    ))
-    model.add(tf.keras.layers.MaxPooling2D(pool_size=(2, 2)))
-    model.add(tf.keras.layers.Dropout(rate=0.3))
-    model.add(tf.keras.layers.Flatten())
-    model.add(tf.keras.layers.Dense(units=1024, activation='relu'))
-    model.add(tf.keras.layers.Dropout(rate=0.3))
-    model.add(tf.keras.layers.Dense(units=no_classes, activation='softmax'))
-    model.compile(loss=tf.keras.losses.categorical_crossentropy,
-                  optimizer=tf.keras.optimizers.Adam(),
+    model = models.Sequential()
+    model.add(layers.Conv2D(32, (3, 3), activation='relu', input_shape=input_shape))
+    model.add(layers.MaxPooling2D((2, 2)))
+    model.add(layers.Conv2D(64, (3, 3), activation='relu'))
+    model.add(layers.MaxPooling2D((2, 2)))
+    model.add(layers.Conv2D(128, (3, 3), activation='relu'))
+    model.add(layers.MaxPooling2D((2, 2)))
+    model.add(layers.Conv2D(128, (3, 3), activation='relu'))
+    model.add(layers.MaxPooling2D((2, 2)))
+    model.add(layers.Flatten())
+    model.add(layers.Dense(512, activation='relu'))
+    model.add(layers.Dense(no_classes, activation='softmax'))
+
+    model.compile(loss=keras.losses.categorical_crossentropy,
+                  optimizer=keras.optimizers.Adam(),
                   metrics=['accuracy'])
+
     return model
 
 
