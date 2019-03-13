@@ -76,7 +76,7 @@ def main():
         batch_size=batch_size
     )
 
-    test_bottleneck_features = vgg_model.predict_generator(test_generator, epoch_steps)
+    test_bottleneck_features = vgg_model.predict_generator(test_generator, test_steps)
 
     train_labels = np.array([0.] * int(no_train / 2) + [1.] * int(no_train / 2))
     test_labels = np.array([0.] * int(no_test / 2) + [1.] * int(no_test / 2))
