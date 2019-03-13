@@ -6,10 +6,13 @@ Created by C. L. Wang on 2019/3/12
 """
 import os
 import sys
+import numpy as np
 
 import keras
 from keras import layers
 from keras import models
+from keras.applications import VGG16
+from keras.layers import *
 from keras.preprocessing.image import ImageDataGenerator
 
 os.environ['CUDA_DEVICE_ORDER'] = 'PCI_BUS_ID'
@@ -25,7 +28,8 @@ from root_dir import DATASET_DIR
 def main():
     """
     loss: 0.4562 - acc: 0.7755 - val_loss: 0.4220 - val_acc: 0.7950
-    augmentation:
+    augmentation: loss: 0.5716 - acc: 0.7070 - val_loss: 0.4888 - val_acc: 0.7662
+
     """
     image_height, image_width = 150, 150
     train_dir = os.path.join(DATASET_DIR, 'train')
@@ -44,21 +48,19 @@ def main():
     epoch_steps = no_train // batch_size
     test_steps = no_test // batch_size
 
-    simple_cnn_model = simple_cnn(input_shape, no_classes)
+    # simple_cnn_model = simple_cnn(input_shape, no_classes)
 
-    generator_train = ImageDataGenerator(
-        rescale=1. / 255.,
-        horizontal_flip=True,
-        zoom_range=0.3,
-        shear_range=0.3
-    )
-    generator_test = ImageDataGenerator(rescale=1. / 255.)
+    vgg_model = VGG16(include_top=False)
 
-    train_generator = generator_train.flow_from_directory(
+    generator = ImageDataGenerator(rescale=1. / 255.)
+
+    train_generator = generator.flow_from_directory(
         train_dir,
         target_size=(image_width, image_height),
         batch_size=batch_size
     )
+
+    train_bottleneck_features = vgg_model.predict_generator(train_generator, epoch_steps)
 
     # 查看数据格式
     # for data_batch, labels_batch in train_generator:
@@ -67,19 +69,40 @@ def main():
     #     print(labels_batch)  # label是oh形式
     #     break
 
-    test_generator = generator_test.flow_from_directory(
+    test_generator = generator.flow_from_directory(
         test_dir,
         target_size=(image_width, image_height),
         batch_size=batch_size
     )
 
-    simple_cnn_model.fit_generator(
-        train_generator,
-        steps_per_epoch=epoch_steps,
+    test_bottleneck_features = vgg_model.predict_generator(test_generator, epoch_steps)
+
+    train_labels = np.array([0] * int(no_train / 2) + [1] * int(no_train / 2))
+    test_labels = np.array([0] * int(no_test / 2) + [1] * int(no_test / 2))
+
+    # simple_cnn_model.fit_generator(
+    #     train_generator,
+    #     steps_per_epoch=epoch_steps,
+    #     epochs=epochs,
+    #     validation_data=test_generator,
+    #     validation_steps=test_steps
+    # )
+
+    model = models.Sequential()
+    model.add(Flatten(input_shape=train_bottleneck_features.shape[1:]))
+    model.add(Dense(1024, activation='relu'))
+    model.add(Dropout(0.3))
+    model.add(Dense(1, activation='softmax'))
+    model.compile(loss=keras.losses.categorical_crossentropy,
+                  optimizer=keras.optimizers.Adam(),
+                  metrics=['accuracy'])
+
+    model.fit(
+        train_bottleneck_features,
+        train_labels,
+        batch_size=batch_size,
         epochs=epochs,
-        validation_data=test_generator,
-        validation_steps=test_steps
-    )
+        validation_data=(test_bottleneck_features, test_labels))
 
 
 def simple_cnn(input_shape, no_classes):
