@@ -80,6 +80,11 @@ def main():
     train_labels = np.array([0.] * int(no_train / 2) + [1.] * int(no_train / 2))
     test_labels = np.array([0.] * int(no_test / 2) + [1.] * int(no_test / 2))
 
+    print(train_bottleneck_features.shape)
+    print(test_bottleneck_features.shape)
+    print(train_labels.shape)
+    print(test_labels.shape)
+
     # simple_cnn_model.fit_generator(
     #     train_generator,
     #     steps_per_epoch=epoch_steps,
