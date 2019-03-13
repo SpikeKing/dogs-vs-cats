@@ -52,9 +52,10 @@ def main():
 
     vgg_model = VGG16(include_top=False)
 
-    generator = ImageDataGenerator(rescale=1. / 255.)
+    generator_train = ImageDataGenerator(rescale=1. / 255.)
+    generator_test = ImageDataGenerator(rescale=1. / 255.)
 
-    train_generator = generator.flow_from_directory(
+    train_generator = generator_train.flow_from_directory(
         train_dir,
         target_size=(image_width, image_height),
         batch_size=batch_size
@@ -69,7 +70,7 @@ def main():
     #     print(labels_batch)  # label是oh形式
     #     break
 
-    test_generator = generator.flow_from_directory(
+    test_generator = generator_test.flow_from_directory(
         test_dir,
         target_size=(image_width, image_height),
         batch_size=batch_size
