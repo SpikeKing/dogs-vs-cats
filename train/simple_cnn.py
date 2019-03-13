@@ -23,6 +23,10 @@ from root_dir import DATASET_DIR
 
 
 def main():
+    """
+    loss: 0.4562 - acc: 0.7755 - val_loss: 0.4220 - val_acc: 0.7950
+    augmentation:
+    """
     image_height, image_width = 150, 150
     train_dir = os.path.join(DATASET_DIR, 'train')
     test_dir = os.path.join(DATASET_DIR, 'test')
@@ -42,7 +46,12 @@ def main():
 
     simple_cnn_model = simple_cnn(input_shape, no_classes)
 
-    generator_train = ImageDataGenerator(rescale=1. / 255.)
+    generator_train = ImageDataGenerator(
+        rescale=1. / 255.,
+        horizontal_flip=True,
+        zoom_range=0.3,
+        shear_range=0.3
+    )
     generator_test = ImageDataGenerator(rescale=1. / 255.)
 
     train_generator = generator_train.flow_from_directory(
