@@ -77,8 +77,8 @@ def main():
 
     test_bottleneck_features = vgg_model.predict_generator(test_generator, epoch_steps)
 
-    train_labels = np.array([0., 1.] * int(no_train / 2) + [1., 0.] * int(no_train / 2))
-    test_labels = np.array([0., 1.] * int(no_test / 2) + [1., 0.] * int(no_test / 2))
+    train_labels = np.array([0.] * int(no_train / 2) + [1.] * int(no_train / 2))
+    test_labels = np.array([0.] * int(no_test / 2) + [1.] * int(no_test / 2))
 
     # simple_cnn_model.fit_generator(
     #     train_generator,
@@ -92,8 +92,8 @@ def main():
     model.add(Flatten(input_shape=train_bottleneck_features.shape[1:]))
     model.add(Dense(1024, activation='relu'))
     model.add(Dropout(0.3))
-    model.add(Dense(2, activation='softmax'))
-    model.compile(loss=keras.losses.categorical_crossentropy,
+    model.add(Dense(1, activation='sigmoid'))
+    model.compile(loss=keras.losses.binary_crossentropy,
                   optimizer=keras.optimizers.Adam(),
                   metrics=['accuracy'])
 
