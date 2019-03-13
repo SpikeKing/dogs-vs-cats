@@ -25,10 +25,9 @@ from root_dir import DATASET_DIR
 def main():
     image_height, image_width = 150, 150
     train_dir = os.path.join(DATASET_DIR, 'train')
-    print(train_dir)
     test_dir = os.path.join(DATASET_DIR, 'test')
 
-    no_classes = 2
+    no_classes = 2  # 猫狗两类
     no_validation = 800
 
     epochs = 10
@@ -52,6 +51,13 @@ def main():
         batch_size=batch_size
     )
 
+    # 查看数据格式
+    # for data_batch, labels_batch in train_generator:
+    #     print(data_batch.shape)
+    #     print(labels_batch.shape)
+    #     print(labels_batch)  # label是oh形式
+    #     break
+
     test_generator = generator_test.flow_from_directory(
         test_dir,
         target_size=(image_width, image_height),
@@ -68,6 +74,9 @@ def main():
 
 
 def simple_cnn(input_shape, no_classes):
+    """
+    网络输入的尺寸，类别数
+    """
     model = models.Sequential()
     model.add(layers.Conv2D(32, (3, 3), activation='relu', input_shape=input_shape))
     model.add(layers.MaxPooling2D((2, 2)))
